@@ -12,7 +12,7 @@ load("aula-02/data/dados_exercicio.RData")
 ##         quero ver uma saída na Console.
 ### # ####
 
-
+str(acessos_alunos)
 
 ### 2 ###
 ## Quantos elementos a variável acessos_alunos possui? Utilize uma função do R que retorna o tamanho da variável.
@@ -20,6 +20,7 @@ load("aula-02/data/dados_exercicio.RData")
 ## Dica: Vimos um exemplo no mesmo material sobre estruturas de dados
 ### # ###
 
+length(acessos_alunos)
 
 
 ### 3 ###
@@ -31,7 +32,7 @@ load("aula-02/data/dados_exercicio.RData")
 ## Dica 2: Vimos exemplos disto nos materiais dos tipos numéricos e das estruturas de dados.
 ### # ###
 
-
+paste("O aluno <alu201830370> realizou", acessos_alunos$alu201830370, "acessos")
 
 ### 4 ###
 ## A operação abaixo cria um vetor com todas as quantidades de acessos por aluno.
@@ -43,13 +44,24 @@ acessos <- unlist(acessos_alunos)
 ## 2. Com uma operação de indexação, crie um outro vetor contendo somente os valores maiores
 ## 3. Determine o tamanho do vetor da operação 2, imprimindo o resultado na Console
 ### # ###
+##Opção 1
+acessos[acessos > 17]
 
+##Opção 2
+acessos_2 <- unlist(acessos > 17)
+acessos[acessos_2]
+
+##Opção 3
+acessos_3 <- acessos[acessos > 17]
 
 
 ### 5 ###
 ## Combine todas as etapas acima em uma única chamada, sem a criação dos vetores auxiliares
 ### # ###
 
+acessos_4 <- acessos_alunos[acessos_alunos > 17]
+
+paste(length(acessos_alunos[acessos_alunos > 17]), "alunos tiveram mais acessos do que eu")
 
 
 ### 6 ###
@@ -59,6 +71,8 @@ acessos <- unlist(acessos_alunos)
 ## Dica: Lembre que falamos sobre como o R faz conversões implícitas entre o tipo lógico e tipos numéricos
 ### # ###
 
+sum(acessos_alunos < 17) 
+paste(sum(acessos_alunos < 17), "alunos tiveram menos acessos do que eu")
 
 
 ### 7 ###
@@ -72,7 +86,11 @@ acessos <- unlist(acessos_alunos)
 ## OBSERVAÇÃO :: Não avaliarei participação na forma do enunciado deste exercício. 
 ### # ###
 
+notas <- acessos
 
+notas[which(notas==0)] <- NA
+notas[which(notas <= 10)] <- 1
+notas[which(notas > 10)] <- 2
 
 ### 8 ###
 ## Visualização da quantidade de alunos com cada nota de participação. Esta não é uma atividade, apenas uma ilustração de como
@@ -87,6 +105,37 @@ table(notas)
 acessos_alunos_e_guest <- acessos_alunos
 acessos_alunos_e_guest$guest <- NA
 
+acessos_alunos_e_guest1 <- acessos_alunos
+acessos_alunos_e_guest1$guest <- NA
+
+##exercíco 4
+acessos_alunos_e_guest$maior_17_1 <- acessos[acessos > 17]
+
+acessos_alunos_e_guest1[acessos_alunos_e_guest1 > 17]
+paste(acessos_alunos_e_guest1[acessos_alunos_e_guest1 > 17], "alunos tiveram mais acessos do que eu")
+
+
+##exercício 5
+acessos_alunos_e_guest$maior_17 <- acessos_alunos[acessos_alunos > 17]
+
+acessos_alunos_e_guest1[acessos_alunos_e_guest1 > 17]
+paste(length(acessos_alunos_e_guest1[acessos_alunos_e_guest1 > 17]), "alunos tiveram mais acessos do que eu")
+
+##exercício 6
+acessos_alunos_e_guest$menor_17 <-sum(acessos_alunos < 17)
+
+sum(acessos_alunos_e_guest1 < 17)
+paste(sum(acessos_alunos_e_guest1 < 17), "alunos tiveram menos acessos do que eu")
+
+
+##exercício 7
+notas1 <- unlist(acessos_alunos_e_guest)
+
+notas1[which(notas1==0)] <- NA
+notas1[which(notas1 <= 10)] <- 1
+notas1[which(notas1 > 10)] <- 2
+
+
 ## Repita as atividades 4, 5, 6, e 7 utilizando o acessos_com_guest no lugar da lista acessos_alunos.
 ## Tome o devido cuidado de sempre criar variáveis com nomes diferentes das já utilizadas! 
 
@@ -97,12 +146,16 @@ acessos_alunos_e_guest$guest <- NA
 
 
 # 1. Houve modificação no número de alunos com mais e com menos acessos que você?
+sim,houve modificação, porem quando se cria uma nova variavel não ocorre a modifiação no numero de alunos
 
 # 2. Como você conclui que o R trata comparações (operações relacionais) entre valores numéricos e NA?
+sempre retorna como verdadeiro
 
 # 3. Qual o resultado do uso da função sum na presença de NA? O que você conclui sobre a operação de soma de todos os valores de
 #    um vetor na presença de NA?
+Não é possivel realizar operações de soma quando o vetor possui valores NA
 
 # 4. Execute o comando abaixo para ler a documentação da função sum e veja se há como modificar a chamada da função sum na presença
 #    de NAs. Teste os exemplos da página de help da função sum.
 help(sum)
+sum(acessos_alunos < 17, na.rm = TRUE)
