@@ -5,6 +5,7 @@
 #'     df_print: paged
 #' ---
 #' 
+#' 
 #' ## Medidas de tendência central e de dispersão
 #' 
 #' Nesta aula trabalharemos com 2 medidas de tendência central e duas medidas de dispersão:
