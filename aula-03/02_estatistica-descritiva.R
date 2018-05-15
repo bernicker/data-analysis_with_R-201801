@@ -205,11 +205,36 @@ subset_salarios %>%
 #' __Atividade I__
 #' 
 #' Crie um novo dataset contendo a média e a mediana do salário por UF. Adicione uma nova variável determinando, para cada UF, se a média é maior ou menor que a mediana. Ao final, exiba a quantidade de UFs onde a mediana foi maior que a média.
-#' 
+
 ## ------------------------------------------------------------------------
 print("Atividade")
-
+subset_com_ano %>%
+  group_by(UF_EXERCICIO) %>%
+  summarise(tempo_medio = mean(year(today()) - ano_ingresso)) %>%
+  arrange(desc(tempo_medio)) %>% View()
 ## Código aqui
+
+subset_salarios %>% group_by(UF_EXERCICIO) %>%  
+  summarise(mean_salario = mean(REMUNERACAO_REAIS)
+            , servidores = n() 
+            , mediana_salario = median(REMUNERACAO_REAIS) 
+            , media_maior = mean_salario > mediana_salario) %>% 
+  ungroup() %>%
+  group_by(media_maior) %>%
+  summarise(total = n()) %>%
+  ungroup()
+
+subset_salarios %>% group_by(UF_EXERCICIO) %>%  
+  summarise(mean_salario = mean(REMUNERACAO_REAIS)
+            , servidores = n() 
+            , mediana_salario = median(REMUNERACAO_REAIS) 
+            , media_maior = mean_salario > mediana_salario) %>% 
+  ungroup() %>%
+  group_by(media_maior) %>%
+  count(total = n() -> subset_media_maior ) %>%
+  ungroup()
+
+
 
 #' 
 #' __Atividade II__
@@ -299,18 +324,74 @@ subset_salarios %>%
 #' 
 #' Verifique a validade deste teorema com os valores calculados.
 #' 
+#' 
+#' 
 ## ------------------------------------------------------------------------
 print("Atividade")
+sd( subset_salarios$REMUNERACAO_REAIS )
+##minha tentativa
+subset_salarios %>% summarise(desvio_padrão = sd(subset_salarios$REMUNERACAO_REAIS)
+                    , multiplicação = mean(subset_salarios$REMUNERACAO_REAIS) + (desvio_padrão * 2))
+                    
+##professor
+dois_desvios_da_media <- mean + dois_desvios
+mean <- mean(subset_salarios$REMUNERACAO_REAIS)
+subset_salarios %>% 
+                filter(REMUNERACAO_REAIS <= dois_desvios_da_media) %>% 
+                nrow() -> total_dentro_de_dois_desvios
 
-## Código aqui
+total_dentro_de_dois_desvios / nrow(subset_salarios)
 
-#' 
+subset_salarios %>% 
+                 mutate(QT_ABAIXO_2D  = REMUNERACAO_REAIS <= dois_desvios_da_media) %>% 
+                 count(QT_ABAIXO_2D)
+
+#' NROW(CONTA AS LINHASS)
 #' __Atividade II__
 #' 
 #' No dataset de salários temos os diferentes cargos ocupados pelos servidores públicos federais. Liste os 10 cargos de __menor coeficiente de variação__ cujo cargo tenha mais que 100 servidores públicos. A lista deve conter, além do cargo e Coeficiente de Variação, a quantidade de servidores, o menor salário, o maior salário, o salário médio e o desvio padrão.
 #' 
 ## ------------------------------------------------------------------------
 print("Atividade")
+    
+
+            
+subset_salarios %>%
+                count(DESCRICAO_CARGO)  %>%
+                filter(n > 100) -> cargos_populares
+
+subset_salarios %>%
+                filter(DESCRICAO_CARGO %in% cargos_populares%DESCRICAO_CARGO)
+
+subset_salarios %>%
+              group_by(DESCRICAO_CARGO) %>%
+              filter(n() > 100) %>%
+              summarise(desvio_padrão = sd(REMUNERACAO_REAIS)
+                       , media = mean(REMUNERACAO_REAIS)
+                       , CV = desvio_padrão/media
+                       , quantidade_servidores = n()
+                       , menor_salario = min(REMUNERACAO_REAIS)
+                       , maximo_salario = max(REMUNERACAO_REAIS)) %>%
+                       ungroup() %>%
+                       arrange(CV) %>% 
+                       head(10)
+
+
+              
+subset_salarios %>%
+  group_by(DESCRICAO_CARGO) %>%
+  filter(n() > 100) %>%
+  summarise(desvio_padrão = sd(REMUNERACAO_REAIS)
+            , media = mean(REMUNERACAO_REAIS)
+            , CV = desvio_padrão/media
+            , quantidade_servidores = n()
+            , menor_salario = min(REMUNERACAO_REAIS)
+            , maximo_salario = max(REMUNERACAO_REAIS)) %>%
+  ungroup() %>%
+  arrange(desc(CV)) %>% 
+  head(10)
+
+
 
 ## Código aqui
 
