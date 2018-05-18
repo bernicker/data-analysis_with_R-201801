@@ -1,8 +1,18 @@
 ### Atividade prática
 
 ## Vamos começar carregando o arquivo de dados preparado para esta aula
-library(tidyverse)
 
+install.packages("tidyverse")
+library(tidyverse)
+install.packages("xlsx")
+library(xlsx)
+
+library(readxl)
+library(data.table)
+library(plyr)
+library(xlsx)
+library(MASS)
+library(dplyr)
 salarios <- read_csv("aula-03/data/201802_dados_salarios_servidores.csv.gz")
 
 ### 1 ####
@@ -13,6 +23,17 @@ salarios <- read_csv("aula-03/data/201802_dados_salarios_servidores.csv.gz")
 ## Após criar esta coluna, descarte todos os registros cuja Remuneração Final for menor que R$ 900,00
 ## 
 ### # ####
+
+##Exercício 1
+
+SALARIO_FIM <- salarios
+
+SALARIO_FIM$REMUNERACAO_NOVA <- SALARIO_FIM$REMUNERACAO_REAIS + (SALARIO_FIM$REMUNERACAO_DOLARES * 3.2428)
+
+
+SALARIO_FIM %>% filter(SALARIO_FIM$REMUNERACAO_NOVA > 900) -> SALARIO_FIM2
+
+
 
 
 ### 2 ####
@@ -26,6 +47,33 @@ salarios %>% count(UF_EXERCICIO) %>% pull(UF_EXERCICIO) -> ufs # EXEMPLO
 ## 
 ### # ####
 
+##Teste do Exercício 2
+
+SALARIO_FIM2 %>% count(DIFR=SALARIO_FIM2$ORGSUP_LOTACAO!=SALARIO_FIM2$ORGSUP_EXERCICIO)
+
+setDT(SALARIO_FIM2)
+SALARIO_FIM2[ , Count := .N, by = list(SALARIO_FIM2$DIFERACAO, SALARIO_FIM2$DESCRICAO_CARGO)]
+
+SALARIO_FIM2 %>% group_by(SALARIO_FIM2$DESCRICAO_CARGO) %>%
+                 count(DIFERACAO)
+##Exercício 2
+
+SALARIO_FIM2$DIFERACAO <- ifelse(SALARIO_FIM2$ORGSUP_LOTACAO!=SALARIO_FIM2$ORGSUP_EXERCICIO,1,0)
+
+SALARIO_FIM2 %>% group_by(DESCRICAO_CARGO) %>%
+                 summarise(quantidade = sum(DIFERACAO), SERVIDORES = n()) %>%
+                 ungroup() %>%
+                 arrange(desc(quantidade)) %>%
+                 head(5)
+
+SALARIO_FIM2 %>% group_by(DESCRICAO_CARGO) %>%
+                 summarise(quantidade = sum(DIFERACAO), SERVIDORES = n()) %>%
+                 ungroup() %>%
+                 arrange(desc(quantidade)) %>%
+                 head(5) %>%
+                 pull(DESCRICAO_CARGO) -> cargos_diferente_lotacao
+
+                
 
 ### 3 ####
 ## 
@@ -49,3 +97,26 @@ salarios %>% filter(DESCRICAO_CARGO %in% c("MINISTRO DE PRIMEIRA CLASSE", "ANALI
 ## 
 ### # ####
 
+##Exercício 3
+SALARIO_FIM3 <- SALARIO_FIM2
+
+(dam_salario <- median( abs( SALARIO_FIM3$REMUNERACAO_NOVA - median( SALARIO_FIM3$REMUNERACAO_NOVA))))
+
+(md_salario <- median( SALARIO_FIM3$REMUNERACAO_NOVA ))
+
+dam_salario / md_salario
+
+SALARIO_FIM3$NDIFERACAO <- ifelse(SALARIO_FIM3$DIFERACAO==1, "LOTADO EM UM DIFERENTE", "LOTADO NO MESMO")
+
+SALARIO_FIM3 %>% group_by(DESCRICAO_CARGO, NDIFERACAO) %>%
+  filter(DESCRICAO_CARGO %in% cargos_diferente_lotacao) %>%
+  summarise(media = mean(REMUNERACAO_NOVA)
+            , desvio_padrão = sd(REMUNERACAO_NOVA)
+            , mediana_salario = median(REMUNERACAO_NOVA)
+            , desvio_absoluto = dam_salario / md_salario
+            , menor_salario = min(REMUNERACAO_NOVA)
+            , maximo_salario = max(REMUNERACAO_NOVA)
+            , quantidade_servidores = n()) %>%
+  ungroup() %>%
+  arrange(desc(quantidade_servidores)) %>% 
+  head(10)  
