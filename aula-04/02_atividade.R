@@ -33,7 +33,10 @@ SALARIO_FIM %>% filter(SALARIO_FIM$REMUNERACAO_NOVA > 900) -> SALARIO_FIM2
 ##PRIMEIRA FORMA
 setDT(SALARIO_FIM2)
 SALARIO_FIM2[ , Count := .N, by = list(SALARIO_FIM2$DESCRICAO_CARGO)]
-SALARIO_FIM2 %>% filter(SALARIO_FIM2$Count > 200) -> SALARIO_FIM3
+
+SF2 <- as_data_frame(SALARIO_FIM2)
+
+SF2 %>% filter(Count > 200) -> SALARIO_FIM3
 
 table(SALARIO_FIM3$Count < 200)
 
@@ -44,14 +47,32 @@ count(SALARIO_FIM2$DESCRICAO_CARGO)
 
 
 ##B)
-SALARIO_FIM3 %>% summarise (corrr = cor(x = 2018 - year(SALARIO_FIM3$DATA_INGRESSO_ORGAO), y = 2018 - year( SALARIO_FIM3$DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))
-                 , Sinal_correlacao = ifelse( corrr > 0, "positivo", "negativo")
-                 , forca_correlation = ifelse( corrr > 0.9, "muito_forte",ifelse(corrr > 0.7 && corrr < 0.9,"forte",ifelse(corrr > 0.5 && corrr < 0.7,"moderado", ifelse(corrr > 0.3 && corrr < 0.5, "fraca",ifelse(corrr < 0.3, "fraca","nenhuma"))))))
+SF2 %>% 
+  group_by(DESCRICAO_CARGO) %>% 
+  mutate(quantidade = n()) %>%
+  ungroup() %>%
+  filter(quantidade >200) %>% 
+  group_by(DESCRICAO_CARGO) %>% 
+  summarise (corrr = cor( x = 2018 - year(DATA_INGRESSO_ORGAO)
+                        , y = 2018 - year(DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))
+             , Sinal_correlacao = ifelse( corrr > 0, "positivo", "negativo")
+             , forca_correlation = ifelse( corrr > 0.9, "muito_forte",ifelse(corrr > 0.7 && corrr < 0.9,"forte",ifelse(corrr > 0.5 && corrr < 0.7,"moderado", ifelse(corrr > 0.3 && corrr < 0.5, "fraca",ifelse(corrr < 0.3, "fraca","nenhuma"))))))%>%
+  ungroup()
+                
+           
+SF2 %>% 
+  group_by(DESCRICAO_CARGO) %>% 
+  mutate(quantidade = n()) %>%
+  ungroup() %>%
+  filter(quantidade >200) %>% 
+  group_by(DESCRICAO_CARGO) %>% 
+  summarise (corrr = cor( x = 2018 - year(DATA_INGRESSO_ORGAO)
+                          , y = 2018 - year(DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))
+             , Sinal_correlacao = ifelse( corrr > 0, "positivo", "negativo")
+             , forca_correlation = ifelse( corrr > 0.9, "muito_forte",ifelse(corrr > 0.7 && corrr < 0.9,"forte",ifelse(corrr > 0.5 && corrr < 0.7,"moderado", ifelse(corrr > 0.3 && corrr < 0.5, "fraca",ifelse(corrr < 0.3, "fraca","nenhuma"))))))%>%
+  ungroup() -> resultado
 
-SALARIO_FIM4 <- summarise (corrr = cor(x = 2018 - year(SALARIO_FIM3$DATA_INGRESSO_ORGAO), y = 2018 - year( SALARIO_FIM3$DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))
-                            , Sinal_correlacao = ifelse( corrr > 0, "positivo", "negativo")
-                            , forca_correlation = ifelse( corrr > 0.9, "muito_forte",ifelse(corrr > 0.7 && corrr < 0.9,"forte",ifelse(corrr > 0.5 && corrr < 0.7,"moderado", ifelse(corrr > 0.3 && corrr < 0.5, "fraca",ifelse(corrr < 0.3, "fraca","nenhuma"))))))
-
+class(resultado)
 
 #' - 0.9 para mais ou para menos indica uma correlação muito forte.
 #' - 0.7 a 0.9 positivo ou negativo indica uma correlação forte.
@@ -60,11 +81,20 @@ SALARIO_FIM4 <- summarise (corrr = cor(x = 2018 - year(SALARIO_FIM3$DATA_INGRESS
 #' - 0 a 0.3 positivo ou negativo indica uma correlação desprezível.
 
 ##C)
-SALARIO_FIM3 %>% summarise (corrr = cor(x = 2018 - year(SALARIO_FIM3$DATA_INGRESSO_ORGAO), y = 2018 - year( SALARIO_FIM3$DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))
-                            , Sinal_correlacao = ifelse( corrr > 0, "positivo", "negativo")
-                            , forca_correlation = ifelse( corrr > 0.9, "muito_forte",ifelse(corrr > 0.7 && corrr < 0.9,"forte",ifelse(corrr > 0.5 && corrr < 0.7,"moderado", ifelse(corrr > 0.3 && corrr < 0.5, "fraca",ifelse(corrr < 0.3, "fraca","nenhuma")))))) -> RESULTADOS
 
+SF2 %>% 
+  group_by(DESCRICAO_CARGO) %>% 
+  mutate(quantidade = n()) %>%
+  ungroup() %>%
+  filter(quantidade >200) %>% 
+  group_by(DESCRICAO_CARGO) %>% 
+  summarise (corrr = cor( x = 2018 - year(DATA_INGRESSO_ORGAO)
+                          , y = 2018 - year(DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))
+             , Sinal_correlacao = ifelse( corrr > 0, "positivo", "negativo")
+             , forca_correlation = ifelse( corrr > 0.9, "muito_forte",ifelse(corrr > 0.7 && corrr < 0.9,"forte",ifelse(corrr > 0.5 && corrr < 0.7,"moderado", ifelse(corrr > 0.3 && corrr < 0.5, "fraca",ifelse(corrr < 0.3, "fraca","nenhuma"))))))%>%
+  ungroup() -> resultado
 
+class(resultado)
 ### 2 ###
 ##
 ## - A partir do dataset do exercício anterior, selecione os 10 cargos de correlação mais forte (seja positiva ou negativa) e os 
@@ -76,3 +106,7 @@ SALARIO_FIM3 %>% summarise (corrr = cor(x = 2018 - year(SALARIO_FIM3$DATA_INGRES
 ### # ###
 ##EXERCICIO 2
 ##A)
+
+resultado %>% summarise(absoluto = abs(corrr)) %>% 
+              arrange(desc(absoluto)) %>% 
+              head(10) 
