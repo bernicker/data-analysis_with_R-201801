@@ -5,13 +5,24 @@
 
 # Crie um dataframe com o conteúdo do arquivo ted_main.csv.gz. 
 
+ted <- read_csv("aula-05/data/ted_main.csv.gz")
 
+colnames(ted)
+str(ted)
 
 
 # Visualize o resumo dos dados do dataframe. Verifique os mínimos, máximos, médias e medianas das variáveis numéricas.
 # As variáveis duration, film_date e published_date estão no tipo de dados apropriado?
 
+summary(ted$comments)
+summary(ted$duration)
+summary(ted$languages)
+summary(ted$num_speaker)
+summary(ted$views)
+summary(ted$published_date)
+summary(ted$film_date)
 
+##As variaveis film_date e published_data devem estar em formato data.
 
 
 # Converta as seguintes variáveis utilizando o pacote Lubridate:
@@ -19,45 +30,62 @@
 #     * film_date, para data, com a função as_datetime.
 #     * published_date, para data, com a função as_datetime..
 
-
-
+ted %>% mutate(duração = as.duration(duration)) %>%
+        mutate(filme_data = as_datetime(film_date)) %>%
+        mutate(publicação_data = as_datetime(published_date)) ->ted_fim2
 
 # Converta as seguintes variáveis character para variáveis categóricas com a função factor.
 #     * event
 #     * speaker_occupation
 
-
+ted_fim2 %>% mutate(evento = factor(event)) %>%
+             mutate(ocupação_falante = factor(speaker_occupation)) -> ted_fim3
 
 
 # Retire do dataframe a variável name
 
-
+ted_fim4 = subset(ted_fim3, select = -name )
 
 
 # Visualize novamente o resumo dos dados do dataframe. Verifique os mínimos, máximos, médias e medianas das variáveis numéricas. Verifique as contagens das variáveis categóricas
 
-
+summary(ted_fim4$comments)
+summary(ted_fim4$duration)
+summary(ted_fim4$languages)
+summary(ted_fim4$num_speaker)
+summary(ted_fim4$views)
 
 
 # Verifique quais registros possuem a menor quantidade de línguas. Corrija para que possuam no mínimo 1 idioma.
 
+table(ted_fim4$languages==0)
+ted_fim4 %>% group_by(description) %>%
+             summarise(linguas = languages == 0) -> resultado1
 
+ted_fim4 %>% group_by(description) %>%
+            filter(languages == 0 ) -> resultado2
 
+ted_fim4 %>% mutate(languages = ifelse(languages == 0,1,ted_fim4$languages)) -> ted_fim5
+table(ted_fim5$languages==0)
 
 # Verifique os 15 registros com menor data de filmagem. 
 
+ted_fim4 %>% arrange(filme_data) %>% head(15)
+                                         
 
 
 
 # Crie um dataframe com a contagem de apresentações por ano de filmagem e visualize todo o seu conteúdo
 
+ted_fim4 %>% group_by(year(filme_data)) %>%
+             count()  -> ted_fim5
 
 
 # Analise os 10 quantis da quantidade de apresentações por ano.
 # Descarte, do data frame de apresentações do TED Talks, aqueles cujo ano de filmagem tiver quantidade de apresentações menor ou igual à quantidade do quarto quantil.
 
-
-
+quantile(ted_fim5$n, c(0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 1,00))
+quantile(ted_fim5$n)
 
 # Verifique novamente o resumo dos dados do dataframe
 
