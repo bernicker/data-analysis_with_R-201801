@@ -2,6 +2,9 @@ library(tidyverse)
 library(lubridate)
 install.packages("lubridate")
 
+detach("package:plyr", unload=TRUE)
+library(plyr)
+
 ## Nesta atividade você deve utilizar o resultado do exercício 01 da Atividade da aula 03 (remuneração em dólares convertida para reais)
 ## Utilize o código daquele exercício como ponto de partida para esta atividade. 
 ## Sempre utilize o caminho relativo, não o caminho absoluto, pois não funcionará na correção do exercício.
@@ -30,19 +33,17 @@ SALARIO_FIM %>% filter(SALARIO_FIM$REMUNERACAO_NOVA > 900) -> SALARIO_FIM2
 ##EXERCICIO 1
 ##A)
 
-##PRIMEIRA FORMA
-setDT(SALARIO_FIM2)
-SALARIO_FIM2[ , Count := .N, by = list(SALARIO_FIM2$DESCRICAO_CARGO)]
-
 SF2 <- as_data_frame(SALARIO_FIM2)
 
-SF2 %>% filter(Count > 200) -> SALARIO_FIM3
+SF2 %>% 
+  group_by(DESCRICAO_CARGO) %>% 
+  mutate(quantidade = n()) %>%
+  ungroup() %>%
+  filter(quantidade > 200) %>% 
+  summarise (corrr = cor( x = 2018 - year(DATA_INGRESSO_ORGAO)
+                          , y = 2018 - year(DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))) %>% 
+  ungroup()
 
-table(SALARIO_FIM3$Count < 200)
-
-cor(x = 2018 - year(SALARIO_FIM3$DATA_INGRESSO_ORGAO), y = 2018 - year( SALARIO_FIM3$DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))
-
-count(SALARIO_FIM2$DESCRICAO_CARGO)
 
 
 
@@ -54,25 +55,10 @@ SF2 %>%
   filter(quantidade >200) %>% 
   group_by(DESCRICAO_CARGO) %>% 
   summarise (corrr = cor( x = 2018 - year(DATA_INGRESSO_ORGAO)
-                        , y = 2018 - year(DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))
-             , Sinal_correlacao = ifelse( corrr > 0, "positivo", "negativo")
-             , forca_correlation = ifelse( corrr > 0.9, "muito_forte",ifelse(corrr > 0.7 && corrr < 0.9,"forte",ifelse(corrr > 0.5 && corrr < 0.7,"moderado", ifelse(corrr > 0.3 && corrr < 0.5, "fraca",ifelse(corrr < 0.3, "fraca","nenhuma"))))))%>%
-  ungroup()
-                
-           
-SF2 %>% 
-  group_by(DESCRICAO_CARGO) %>% 
-  mutate(quantidade = n()) %>%
-  ungroup() %>%
-  filter(quantidade >200) %>% 
-  group_by(DESCRICAO_CARGO) %>% 
-  summarise (corrr = cor( x = 2018 - year(DATA_INGRESSO_ORGAO)
                           , y = 2018 - year(DATA_DIPLOMA_INGRESSO_SERVICOPUBLICO ))
              , Sinal_correlacao = ifelse( corrr > 0, "positivo", "negativo")
              , forca_correlation = ifelse( corrr > 0.9, "muito_forte",ifelse(corrr > 0.7 && corrr < 0.9,"forte",ifelse(corrr > 0.5 && corrr < 0.7,"moderado", ifelse(corrr > 0.3 && corrr < 0.5, "fraca",ifelse(corrr < 0.3, "fraca","nenhuma"))))))%>%
-  ungroup() -> resultado
-
-class(resultado)
+  ungroup()
 
 #' - 0.9 para mais ou para menos indica uma correlação muito forte.
 #' - 0.7 a 0.9 positivo ou negativo indica uma correlação forte.
@@ -107,6 +93,37 @@ class(resultado)
 ##EXERCICIO 2
 ##A)
 
-resultado %>% summarise(absoluto = abs(corrr)) %>% 
-              arrange(desc(absoluto)) %>% 
-              head(10) 
+
+resultado$corrabs <- abs(resultado$corrr) 
+
+SF3 <- as_data_frame(resultado)
+
+SF3 %>% group_by(DESCRICAO_CARGO) %>%
+  summarise(corr = corrabs) %>% 
+  arrange(desc(corr)) %>% 
+  head(10)  -> forte
+
+SF3 %>% group_by(DESCRICAO_CARGO) %>%
+  summarise(corr = corrabs) %>% 
+  arrange(corr) %>% 
+  head(10) -> fraco
+##B
+merge(forte, fraco,all = TRUE) -> total
+
+CARGO_FINAL <- total %>% pull(DESCRICAO_CARGO)
+
+SF2 %>% filter(DESCRICAO_CARGO %in% CARGO_FINAL) %>%
+  group_by(ORGSUP_EXERCICIO) %>%
+  summarise(quantidade = n()) %>%
+  ungroup() %>%
+  arrange(desc(quantidade)) %>%
+  head(20)
+
+SF2 %>% filter(DESCRICAO_CARGO %in% CARGO_FINAL) %>%
+  group_by(ORGSUP_LOTACAO) %>%
+  summarise(quantidade = n()) %>%
+  ungroup() %>%
+  arrange(desc(quantidade)) %>%
+  head(20)
+
+## EXISTE DIFERENÇA ENTRE AS MODAS
