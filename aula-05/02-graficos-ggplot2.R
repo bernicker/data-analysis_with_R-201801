@@ -55,7 +55,9 @@ library(Hmisc)
 #' 
 ## ----echo=FALSE, message=FALSE, warning=FALSE----------------------------
 ### Carga dos dados de exemplo
-ted_talks <- read_csv("data/ted_main.csv.gz") %>%
+
+ted_talks <- read_csv("aula-05/data/ted_main.csv.gz")
+ted_talks <- read_csv("aula-05/data/ted_main.csv.gz") %>%
   mutate( duration  = duration(duration, units = "seconds")
         , film_date = as_datetime(film_date) %>% as_date()
         , published_date = as_datetime(published_date)) %>%
@@ -384,7 +386,59 @@ ggcorrplot(corr, hc.order = TRUE, type = "lower", lab = TRUE)
 #' - [http://tinlizzie.org/histograms/](http://tinlizzie.org/histograms/)
 #' 
 #' 2. Estude o help da função `geom_histogram`
-#' 
+
+  
+scale_y_continuous(labels = scales::format_format(big.mark = ".", decimal.mark=",", scientific = FALSE)) +
+  labs( x = "Ano de filmagem"
+        , y = "Total de visualizações de apresentações"
+        , title = "Exemplo com geom_col"
+        , subtitle = "Exibição do total de visualizações de apresentações de um mesmo ano de filmagem") +
+  theme_bw()
+
+
+
+
 #' 3. Crie um histograma da quantidade de visualizações multifacetado por ano de publicação, restrito aos anos entre 2012 e 2017.
-#' 
-#' > FIM ATIVIDADE
+ted_talks_recentes %>% filter(year(film_date) >= 2012) -> TED_FINAL
+
+TED_FINAL %>% group_by(year(film_date)) %>%
+  summarise(ano = n()) %>%
+  ungroup()
+
+TED_FINAL %>% mutate(ano = year(film_date)) -> TED_FINALL
+
+TED_FINAL %>% ggplot(aes(x = views)) +
+              geom_histogram()
+
+TED_FINALL %>% ggplot(aes(x = views)) +
+               geom_histogram(color="darkblue", fill="lightblue", bins = 100)
+
+TED_FINALL %>% ggplot(aes(x = views)) +
+               geom_histogram(color="darkblue", fill="lightblue", bins = 100) +
+               scale_x_continuous(labels = scales::format_format(scientific = FALSE))
+
+
+TED_FINALL %>% ggplot(aes(x = views)) +
+               geom_histogram(color="darkblue", fill="lightblue", bins = 100) +
+               scale_x_continuous(labels = scales::format_format(scientific = FALSE)) +
+               labs(title = "Histograma") +
+                theme_bw()
+
+TED_FINALL %>% ggplot(aes(x = views)) +
+               geom_histogram(color="darkblue", fill="lightblue", bins = 100) +
+               scale_x_continuous(labels = scales::format_format(scientific = FALSE)) +
+               labs(title = "Histograma") +
+               theme_classic()
+
+
+TED_FINALL %>% ggplot(aes(x = views)) +
+               geom_histogram(color="darkblue", fill="lightblue", bins = 50) +
+               scale_x_continuous(labels = scales::format_format(scientific = FALSE)) +
+               geom_vline(aes(xintercept=mean(views)), color="red",linetype="dashed") +
+               labs(title = "Histograma") +
+               theme_classic()
+
+
+
+               
+
