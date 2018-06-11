@@ -263,12 +263,54 @@ pgeom(6, prob=0.1, lower.tail = TRUE)
 #' 
 #' 1. Faça o gráfico da distribuição de probabilidades de chamadas telefônicas até 20 ligações e simule 500 eventos de Bernoulli para esta mesma probabilidade. Nesta simulação, identifique quantas sequências de 6 falhas ocorreram. Use como _seed_ os últimos 5 dígitos da sua matrícula. Veja no exemplo anterior o uso da função `rle`.
 #' 
+set.seed(201870)
+
+(final <- rbernoulli(500, 0.1))
+
+(final_2 <- rle(final))
+
+final_2$lengths[!final_2$values]
+
+round( prop.table( table(final_2$lengths[!final_2$values]) ), 2)
+
+
+resposta <- data_frame(x = 0:20, y=pgeom(0:20, prob = 0.1) * 100)
+
+ggplot(resposta, aes(x=x, y=y)) +
+  geom_col() +
+  scale_x_continuous(name = "atender ou não", breaks=0:20) +
+  scale_y_continuous(name = "Prob (%)") +
+  theme_light()
+
 #' 2. Você criou um sistema para reclamações da demora do atendimento de ligações telefônicas durante quedas de conectividade da Internet, e exige que os usuários acertem um CAPTCHA antes de postarem uma reclamação. Você observou que a probabilidade de um usuário acertar o CAPTCHA exibido no seu sistema é de 70%. 
 #' 
 #' - Seu sistema de monitoramento identificou que um usuário tentou 5 CAPTCHAS diferentes antes de conseguir reclamar do tempo de atendimento na última queda de conectividade. 
 #'     + Qual a probabilidade de um usuário acertar o CAPTCHA após 5 tentativas fracassadas? Qual o mínimo de tentativas para que a probabilidade seja maior que 50%?
-#'     
-#'     + Você observou que, das últimas 500 _tentativas_ de publicação de reclamações, 340 acertaram a validação de CAPTCHA. Qual a probabilidade de uma quantidade entre 320 e 350 tentativas passarem pela validação de CAPTCHA a cada 500 tentativas? Dada a probabilidade de 70% de sucesso, qual o número esperado de publicações a cada 500 CAPTCHAS? DICA: ESTAMOS TRATANDO DA DISTRIBUIÇÃO BINOMIAL.
+
+df_geom_probs_2 <- data_frame(x = 0:6, y=dgeom(0:6, prob = 0.7) * 100)
+
+ggplot(df_geom_probs_2, aes(x=x, y=y)) +
+  geom_col() +
+  scale_x_continuous(name = "Tentativa até conseguir acertar o CAPTCHAS", breaks=0:10) +
+  scale_y_continuous(name = "Prob (%)", breaks=seq(from=0, to=100, by=5)) +
+  theme_light()
+
+
+Qual o mínimo de tentativas para que a probabilidade seja maior que 50%? 0 TENTATIVAS
+  
+
+
+#, + Você observou que, das últimas 500 _tentativas_ de publicação de reclamações, 340 acertaram a 
+#, validação de CAPTCHA. Qual a probabilidade de uma quantidade entre 320 e 350 tentativas passarem pela validação de 
+#, CAPTCHA a cada 500 tentativas? Dada a probabilidade de 70% de sucesso, qual o número esperado de publicações a cada 500 CAPTCHAS? 
+#, DICA: ESTAMOS TRATANDO DA DISTRIBUIÇÃO BINOMIAL.
+
+SEQUENCIA <- seq(from=320, to=350, by=01)
+pbinom( SEQUENCIA, size = 500, prob = 0.70, lower.tail = FALSE )
+
+
+
+
 #' 
 #' >> FIM ATIVIDADE
 #' 
