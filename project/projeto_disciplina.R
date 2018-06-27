@@ -13,13 +13,38 @@ insta_products <- read_csv( "project/order_products_instacart.csv" ) # Produtos 
 #1 # Quantos dos produtos do cadastro nunca foram comprados?
 
 
+
 #2 # Crie um dataframe com os dados combinados de produtos, corredores e departamentos. 
 
+names(departments)
+names(aisles)
+names(products)
+
+PRO_DEP <- merge(departments, products, id="department_id")
+
+PRO_DEP_AIS <- merge(PRO_DEP, aisles, id="aisle_id")
 
 #3 # Quais as 10 combinações corredor + departamento que possuem mais produtos cadastrados? Use o dataframe da atividade #2.
 
+names(PRO_DEP_AIS)
+
+PRO_DEP_AIS %>% group_by(department_id, aisle_id) %>%
+                summarise(QUANTIDADE_PRODUTOS = n()) %>%
+                ungroup() %>%
+                arrange(desc(QUANTIDADE_PRODUTOS)) %>%
+                head(10) -> LISTA_10_MAIORES_COMBINACOES
+##RESPOSTA
+LISTA_10_MAIORES_COMBINACOES
 
 #4 # Qual o percentual de pedidos que possuem algum produto dos pares 'corredor + departamento' da atividade anterior?
+insta_orders    # Amostra de pedidos de usuários
+insta_products  # Produtos que compõe os pedidos
+
+department_id <- unlist(LISTA_10_MAIORES_COMBINACOES$department_id)
+aisle_id <- unlist(LISTA_10_MAIORES_COMBINACOES$aisle_id)
+
+
+
 
 
 #5 # Crie um novo dataframe de produtos em pedidos retirando aqueles produtos que não estão categorizados (usar resultado das atividades 3 e 4)
