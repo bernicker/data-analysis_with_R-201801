@@ -40,14 +40,39 @@ LISTA_10_MAIORES_COMBINACOES
 insta_orders    # Amostra de pedidos de usuários
 insta_products  # Produtos que compõe os pedidos
 
-department_id <- unlist(LISTA_10_MAIORES_COMBINACOES$department_id)
-aisle_id <- unlist(LISTA_10_MAIORES_COMBINACOES$aisle_id)
+LISTA_10_MAIORES_COMBINACOES %>% select(department_id) -> department_id
+LISTA_10_MAIORES_COMBINACOES %>% select(aisle_id) -> aisle_id
+
+PRIMEIRA_PARTE <- merge(PRO_DEP_AIS,department_id, id= "department_id")
+SEGUNDA_PARTE <- merge(PRIMEIRA_PARTE,aisle_id, id= "aisle_id")
+
+names(SEGUNDA_PARTE)
+
+SEGUNDA_PARTE %>% distinct(product_id) %>% mutate(PEDIDO = 1) -> product_id
+TERCEIRA_PARTE <- merge(insta_products, product_id, id="product_id", all = TRUE )
+
+TERCEIRA_PARTE$NOVO_PEDIDO <- ifelse(is.na(TERCEIRA_PARTE$PEDIDO == ""),0,1)
+class(TERCEIRA_PARTE)
+
+names(TERCEIRA_PARTE)
+
+TERCEIRA_PARTE %>% group_by(order_id) %>%
+                  summarise(maximo = max(NOVO_PEDIDO)) -> QUARTA_PARTE
+
+table(QUARTA_PARTE$maximo)
+count(QUARTA_PARTE$maximo)
+
+##RESPOSTA
+(resultado <- 82344 + 48866)
+(resultado <- (82344/131210)*100)
+
 
 
 
 
 
 #5 # Crie um novo dataframe de produtos em pedidos retirando aqueles produtos que não estão categorizados (usar resultado das atividades 3 e 4)
+
 
 
 #6 # Crie um dataframe que combine todos os dataframes através das suas chaves de ligação. Para produtos de pedidos, use o dataframe da atividade 4
