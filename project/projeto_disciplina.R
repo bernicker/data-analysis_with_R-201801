@@ -1,6 +1,7 @@
 # Descrição dos dados: https://tech.instacart.com/3-million-instacart-orders-open-sourced-d40d29ead6f2
 # Estamos trabalhando com somente uma amostra do total de pedidos. O dataset abaixo não possui 3 milhões de pedidos ;)
 library( tidyverse )
+library(tidyverse)
 
 departments <- read_csv("project/departments.csv")                   # Cadastro de Departamentos
 aisles <- read_csv("project/aisles.csv")                             # Cadastro de "Corredores"
@@ -73,7 +74,19 @@ count(QUARTA_PARTE$maximo)
 
 #5 # Crie um novo dataframe de produtos em pedidos retirando aqueles produtos que não estão categorizados (usar resultado das atividades 3 e 4)
 
+TERCEIRA_PARTE %>% filter(PEDIDO == 1) -> PRIMEIRA_PARTE_5
 
+head(PRIMEIRA_PARTE_5)
+
+head(PRO_DEP_AIS)
+
+PRO_DEP_AIS %>% filter(aisle_id==100) -> SEGUNDA_PARTE_5
+
+TERCEIRA_PARTE_5 <- merge(PRIMEIRA_PARTE_5,SEGUNDA_PARTE_5, by="product_id", all.x= TRUE)
+
+head(TERCEIRA_PARTE_5)
+
+TERCEIRA_PARTE_5 %>% filter(is.na(aisle_id == "")) -> resposta_5
 
 #6 # Crie um dataframe que combine todos os dataframes através das suas chaves de ligação. Para produtos de pedidos, use o dataframe da atividade 4
    # Transforme as variáveis user_id, department e aisle em factor
