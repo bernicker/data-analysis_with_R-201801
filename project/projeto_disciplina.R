@@ -218,10 +218,10 @@ EXERCICIO_6 %>%
   summarise(qtd_pedidos = max(order_number)) %>%
   ungroup() %>%
   filter(qtd_pedidos >= 5) %>%
-  select(user_id) -> usuario_mais_4_pedidos
+  select(user_id) -> usuario_mais_igual_5_pedidos
 
 EXERCICIO_6 %>%
-  filter(user_id %in% pull(usuario_mais_4_pedidos)) %>%
+  filter(user_id %in% pull(usuario_mais_igual_5_pedidos)) %>%
   group_by(user_id) %>%
   summarise(tempo_medio = mean(days_since_prior_order)) %>%
   ungroup() %>%
