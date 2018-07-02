@@ -48,15 +48,28 @@ EXERCICIO_4_1 <- insta_products %>%
   left_join(departments, by="department_id")
 
 
-EXERCICIO_4_2 <- EXERCICIO_4_1 %>%
-                 left_join(RESPOSTA_EXERCICIO_3, by="aisle_id","department_id")
+RESPOSTA_EXERCICIO_3 %>% select(department_id) -> department_id
+RESPOSTA_EXERCICIO_3 %>% select(aisle_id) -> aisle_id
 
-EXERCICIO_4_2 %>% mutate(pedido = ifelse(n >= 1,1,0)) -> EXERCICIO_4_2_1
+PRIMEIRA_PARTE <- merge(EXERCICIO_2,department_id, id= "department_id")
+SEGUNDA_PARTE <- merge(PRIMEIRA_PARTE,aisle_id, id= "aisle_id")
 
-EXERCICIO_4_2_1 %>% group_by(order_id) %>%
-                    summarise(pedido_novo = max(pedido)) -> EXERCICIO_4_2_2
+names(SEGUNDA_PARTE)
 
-table(EXERCICIO_4_2_2$pedido_novo)
+SEGUNDA_PARTE %>% distinct(product_id) %>% mutate(PEDIDO = 1) -> product_id
+TERCEIRA_PARTE <- merge(insta_products, product_id, id="product_id", all = TRUE )
+
+TERCEIRA_PARTE$NOVO_PEDIDO <- ifelse(is.na(TERCEIRA_PARTE$PEDIDO == ""),0,1)
+class(TERCEIRA_PARTE)
+
+names(TERCEIRA_PARTE)
+
+TERCEIRA_PARTE %>% group_by(order_id) %>%
+                   summarise(maximo = max(NOVO_PEDIDO)) -> QUARTA_PARTE
+
+table(QUARTA_PARTE$maximo)
+count(QUARTA_PARTE$maximo)
+
 
 (resultado <- (82344/131210)*100)
 
